@@ -1,0 +1,1 @@
+# DevOps-Aula05-kube-news
