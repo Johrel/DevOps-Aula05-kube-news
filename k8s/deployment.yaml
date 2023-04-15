@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgre
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgre
+  template:
+    metadata:
+      labels:
+        app: postgre
+    spec:
+      containers:
+        - name: postgre
+          image: postgres:15.0
+          ports:
+          - containerPort: 5432
+          env:
+          - name: POSTGRES_PASSWORD
+            value: "admin"
+          - name: POSTGRES_USER
+            value: "admin"
+          - name: POSTGRES_DB
+            value: "BD-DevOps"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgre
+spec:
+  selector:
+    app: postgre
+  ports:
+    - port: 5432
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: jonfresbr/kube-news:{{TAG}}
+          ports:
+          - containerPort: 8080
+          env:
+          - name: DB_DATABASE
+            value: "BD-DevOps"
+          - name: DB_USERNAME
+            value: "admin"
+          - name: DB_PASSWORD
+            value: "admin"
+          - name: DB_HOST
+            value: "postgre"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  selector:
+    app: web
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30000
+  type: LoadBalancer
