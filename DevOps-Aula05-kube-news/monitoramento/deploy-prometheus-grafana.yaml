@@ -1260,10 +1260,10 @@ spec:
 
   type: NodePort
   ports:
-  - name: service
+  - name: web
     port: 80
     targetPort: 3000
-    nodePort: 30001
+    nodePort: 30005
   selector:
     app.kubernetes.io/name: grafana
     app.kubernetes.io/instance: grafana
